@@ -1,8 +1,5 @@
 /** imageUrlを渡すと, 圧縮してくれ、blobを返す */
 /** 使うときはResizer.resize(); */
-
-
-
 (function(global) {
 
   /*
@@ -22,11 +19,25 @@
 
     /** img.src読み込み後の処理 */
     img.onload = function() {
+
       /** 画像をリサイズ */
       const base64 = resizeImage(img);
-      return base64
+
+      /*
+       * 圧縮したデータをオブジェクトに保持させる
+       */
+      /** base64データ */
+      self.base64data = base64;
+      /** blobデータ */
+      self.blob = base64ToBlob(base64);
+
+      /** callback関数を発火させる */
+      self.onResized();
     };
   }
+
+  /** リサイズが終わった後に実行されるcallback関数 */
+  Resizer.onResized;
 
   /*
    * @param img Imageオブジェクト
@@ -88,3 +99,10 @@
  * 持たなくてはならない
  */
 const ret = Resizer.resize('./images/test.jpg');
+
+/** リサイズが終わった後に実行されるcallback関数 */
+Resizer.onResized = function() {
+  /** ここで、圧縮後のbase64にアクセスしたい */
+  console.log(Resizer.base64data);
+  console.log(Resizer.blob);
+}
