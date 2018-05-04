@@ -6,6 +6,7 @@
    * publicなオブジェクト
    * (はじめはコンストラクタで書いていたが、そもそもnewする必要が無いので
    * オブジェクトで提供することにした)
+   * ※ ただし、複数のresizerが必要な場合は、個々を今後はコンストラクタにする必要がある
    */
   Resizer = {
     /** リサイズの設定 */
@@ -59,7 +60,7 @@
     const height = img.height;
 
     // 縮小後のサイズを計算。ここでは横幅 (width) を指定
-    const dstWidth = 1280;
+    const dstWidth = Resizer.config.width;
     const scale = dstWidth / width;
     const dstHeight = height * scale;
 
@@ -110,10 +111,15 @@
  * これを防ぐには、resizeが終わった時のcallbak関数を
  * 持たなくてはならない
  */
+Resizer.config = {
+  width: '80'
+};
+
 Resizer.resize('./images/test.jpg');
 
 /** リサイズが終わった後に実行されるcallback関数 */
 Resizer.onResized = function(image) {
   /** ここで、圧縮後のbase64にアクセスしたい */
-  console.log(image);
+  console.log(image.base64data);
+  $('img').attr('src', image.base64data);
 }
