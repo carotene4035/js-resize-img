@@ -7,32 +7,43 @@
    * (はじめはコンストラクタで書いていたが、そもそもnewする必要が無いので
    * オブジェクトで提供することにした)
    */
-  Resizer = {};
+  Resizer = {
+    /** リサイズの設定 */
+    config: {},
+    /** リサイズされる前のimageオブジェクト */
+    image: null,
+    /** リサイズされた後のimage */
+    resizedImage: {}
+  };
 
   Resizer.resize = function(imageUrl) {
+
     // Image オブジェクトに src を指定すると、元画像の width と height が取れる
-    const img = new Image();
+    this.image = new Image();
 
     /** リーダから読み込んだ値をオブジェクト化 */
-    img.src = imageUrl;
+    this.image.src = imageUrl;
     var self = this;
 
     /** img.src読み込み後の処理 */
-    img.onload = function() {
+    this.image.onload = function() {
 
       /** 画像をリサイズ */
-      const base64 = resizeImage(img);
+      const base64 = resizeImage(self.image);
 
       /*
        * 圧縮したデータをオブジェクトに保持させる
        */
       /** base64データ */
-      self.base64data = base64;
+      self.resizedImage.base64data = base64;
       /** blobデータ */
-      self.blob = base64ToBlob(base64);
+      self.resizedImage.blob = base64ToBlob(base64);
 
-      /** callback関数を発火させる */
-      self.onResized();
+      /*
+       * リサイズ処理がここですべて終わるので、
+       * callback関数を発火させ、リサイズされた画像データを返す
+       */
+      self.onResized(self.resizedImage);
     };
   }
 
@@ -61,6 +72,7 @@
 
     // Canvas オブジェクトから Data URL を取得
     const resized = canvas.toDataURL('image/jpeg');
+
     return resized;
   }
 
@@ -98,11 +110,10 @@
  * これを防ぐには、resizeが終わった時のcallbak関数を
  * 持たなくてはならない
  */
-const ret = Resizer.resize('./images/test.jpg');
+Resizer.resize('./images/test.jpg');
 
 /** リサイズが終わった後に実行されるcallback関数 */
-Resizer.onResized = function() {
+Resizer.onResized = function(image) {
   /** ここで、圧縮後のbase64にアクセスしたい */
-  console.log(Resizer.base64data);
-  console.log(Resizer.blob);
+  console.log(image);
 }
