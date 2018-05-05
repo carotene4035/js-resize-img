@@ -8,7 +8,7 @@
    * オブジェクトで提供することにした)
    * ※ ただし、複数のresizerが必要な場合は、個々を今後はコンストラクタにする必要がある
    */
-  Resizer = {
+  RS = {
     /** リサイズの設定 */
     config: {},
     /** リサイズされる前のimageオブジェクト */
@@ -17,7 +17,7 @@
     resizedImage: {}
   };
 
-  Resizer.resize = function(imageUrl) {
+  RS.resize = function(imageUrl) {
 
     // Image オブジェクトに src を指定すると、元画像の width と height が取れる
     this.image = new Image();
@@ -28,6 +28,7 @@
 
     /** img.src読み込み後の処理 */
     this.image.onload = function() {
+      console.log(self.image);
 
       /** 画像をリサイズ */
       const base64 = resizeImage(self.image);
@@ -49,7 +50,7 @@
   }
 
   /** リサイズが終わった後に実行されるcallback関数 */
-  Resizer.onResized;
+  RS.onResized;
 
   /*
    * @param img Imageオブジェクト
@@ -60,7 +61,7 @@
     const height = img.height;
 
     // 縮小後のサイズを計算。ここでは横幅 (width) を指定
-    const dstWidth = Resizer.config.width;
+    const dstWidth = RS.config.width;
     const scale = dstWidth / width;
     const dstHeight = height * scale;
 
@@ -101,7 +102,7 @@
     return blob;
   }
 
-  global.Resizer = Resizer;
+  global.RS = RS;
 
 })(this);
 
@@ -111,14 +112,14 @@
  * これを防ぐには、resizeが終わった時のcallbak関数を
  * 持たなくてはならない
  */
-Resizer.config = {
+RS.config = {
   width: '80'
 };
 
-Resizer.resize('./images/test.jpg');
+RS.resize('./images/test.jpg');
 
 /** リサイズが終わった後に実行されるcallback関数 */
-Resizer.onResized = function(image) {
+RS.onResized = function(image) {
   /** ここで、圧縮後のbase64にアクセスしたい */
   console.log(image.base64data);
   $('img').attr('src', image.base64data);
