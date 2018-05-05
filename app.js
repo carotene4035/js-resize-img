@@ -17,8 +17,7 @@
     resizedImage: {}
   };
 
-  RS.resize = function(imageUrl) {
-
+  RS.read = function(imageUrl, callback) {
     // Image オブジェクトに src を指定すると、元画像の width と height が取れる
     this.image = new Image();
 
@@ -28,29 +27,31 @@
 
     /** img.src読み込み後の処理 */
     this.image.onload = function() {
-      console.log(self.image);
-
-      /** 画像をリサイズ */
-      const base64 = resizeImage(self.image);
-
-      /*
-       * 圧縮したデータをオブジェクトに保持させる
-       */
-      /** base64データ */
-      self.resizedImage.base64data = base64;
-      /** blobデータ */
-      self.resizedImage.blob = base64ToBlob(base64);
-
-      /*
-       * リサイズ処理がここですべて終わるので、
-       * callback関数を発火させ、リサイズされた画像データを返す
-       */
-      self.onResized(self.resizedImage);
-    };
+      callback(self);
+    }
   }
 
-  /** リサイズが終わった後に実行されるcallback関数 */
-  RS.onResized;
+  RS.resize = function() {
+    const base64 = resizeImage(this.image);
+
+    /*
+     * 圧縮したデータをオブジェクトに保持させる
+     */
+    /** base64データ */
+    this.resizedImage.base64data = base64;
+    /** blobデータ */
+    this.resizedImage.blob = base64ToBlob(base64);
+
+    return this;
+  }
+
+  RS.getBase64Data = function() {
+    return this.resizedImage.base64data;
+  }
+
+  RS.getBlobData = function() {
+    return this.resizedImage.blob;
+  }
 
   /*
    * @param img Imageオブジェクト
@@ -116,11 +117,8 @@ RS.config = {
   width: '80'
 };
 
-RS.resize('./images/test.jpg');
+RS.read('./images/test.jpg', function(img) {
+  var data = img.resize().getBase64Data();
+   $('img').attr('src', data);
+});
 
-/** リサイズが終わった後に実行されるcallback関数 */
-RS.onResized = function(image) {
-  /** ここで、圧縮後のbase64にアクセスしたい */
-  console.log(image.base64data);
-  $('img').attr('src', image.base64data);
-}
